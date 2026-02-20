@@ -143,14 +143,6 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
             },
             child: Text('OK'),
           ),
-
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _resetGame();
-            },
-            child: Text('Restart'),
-          ),
         ],
       ),
     );
@@ -169,13 +161,29 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
             },
             child: Text('OK'),
           ),
+        ],
+      ),
+    );
+  }
 
+  void _showTutorial() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('How to Play'),
+        content: Text(
+          '• Hunger increases every 30 seconds.\n'
+          '• Play with your pet to increase happiness.\n'
+          '• Feed your pet to reduce hunger.\n\n'
+          'Win Condition:\n'
+          '• Keep happiness above 80 for 3 minutes.\n\n'
+          'Loss Condition:\n'
+          '• Hunger reaches 100 AND happiness drops to 10.',
+        ),
+        actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _resetGame();
-            },
-            child: Text('Restart'),
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Got it'),
           ),
         ],
       ),
@@ -196,6 +204,19 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Digital Pet'),
+        actions: [
+          // Tutorial and reset buttons in the app bar
+          IconButton(
+            icon: Icon(Icons.help_outline),
+            onPressed: _showTutorial,
+            tooltip: 'How to Play',
+          ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: _resetGame,
+            tooltip: 'Restart Game',
+          ),
+        ],
       ),
       body: Stack(
         alignment: Alignment.center,
@@ -203,7 +224,6 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-
               // Display pet name and image with mood color
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -227,8 +247,8 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
                   BlendMode.modulate,
                 ),
                 child: Container(
-                  width: 150.0,
-                  height: 150.0,
+                  width: 200.0,
+                  height: 200.0,
                   child: Image.asset('assets/pet_image2.jpg'),
                 )
               ),
@@ -265,11 +285,12 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
                   ),
                 ],
               ),
+              SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _playWithPet,
                 child: Text('Play with Your Pet'),
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 8.0),
               ElevatedButton(
                 onPressed: _feedPet,
                 child: Text('Feed Your Pet'),
