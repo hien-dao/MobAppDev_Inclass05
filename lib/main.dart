@@ -21,13 +21,16 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   int hungerLevel = 50;
 
   Timer? _hungerTimer;
+  DateTime? happinessStartTime;
+  bool hasWon = false;
+
   TextEditingController textController = TextEditingController();
   late ConfettiController confettiController;
 
   @override
   void initState() {
     super.initState();
-    _hungerTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+    _hungerTimer = Timer.periodic(Duration(seconds: 3), (timer) {
       _updateHunger();
     });
     confettiController = ConfettiController(duration: const Duration(seconds: 1));
@@ -67,6 +70,27 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     });
   }
 
+  void _checkWinCondition() {
+    if (happinessLevel > 80) {
+      happinessStartTime ??= DateTime.now();
+
+      final elapsed = DateTime.now().difference(happinessStartTime!);
+      if (elapsed.inMinutes >= 1 && !hasWon) {
+        hasWon = true;
+        _showWin();
+      }
+    } else {
+      happinessStartTime = null;
+    }
+  }
+
+  void _checkLossCondition() {
+  if (hungerLevel >= 100 && happinessLevel <= 10) {
+    _showLoss();
+  }
+}
+
+
   void _playWithPet() {
     setState(() {
       happinessLevel += 10;
@@ -82,11 +106,15 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   }
 
   void _updateHappiness() {
-    if (hungerLevel < 30) {
-      happinessLevel -= 20;
-    } else {
-      happinessLevel += 10;
-    }
+    setState(() {
+      if (hungerLevel < 30) {
+        happinessLevel -= 20;
+      } else {
+        happinessLevel += 10;
+      }
+      _checkWinCondition();
+      _checkLossCondition();
+    });
   }
 
   void _updateHunger() {
@@ -96,12 +124,72 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
         hungerLevel = 100;
         happinessLevel -= 20;
       }
+      _checkWinCondition();
+      _checkLossCondition();
     });
   }
 
-  //void gameWon() 
+  void _showWin() {
+    confettiController.play();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('YOU WON!'),
+        content: Text('Congratulation! $petName is very happy!!!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _resetGame();
+            },
+            child: Text('Restart'),
+          ),
+        ],
+      ),
+    );
+  }
     
-  //void gameLost()
+  void _showLoss() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('YOU LOST!'),
+        content: Text('$petName is very upset and it might eat you!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _resetGame();
+            },
+            child: Text('Restart'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _resetGame() {
+    setState(() {
+      happinessLevel = 50;
+      hungerLevel = 50;
+      hasWon = false;
+      happinessStartTime = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
