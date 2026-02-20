@@ -19,6 +19,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   String petName = "Your Pet";
   int happinessLevel = 50;
   int hungerLevel = 50;
+  int energyLevel = 100;
 
   Timer? _hungerTimer;
   DateTime? happinessStartTime;
@@ -30,7 +31,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
   @override
   void initState() {
     super.initState();
-    _hungerTimer = Timer.periodic(Duration(seconds: 3), (timer) {
+    _hungerTimer = Timer.periodic(Duration(seconds: 30), (timer) {
       _updateHunger();
     });
     confettiController = ConfettiController(duration: const Duration(seconds: 1));
@@ -75,7 +76,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       happinessStartTime ??= DateTime.now();
 
       final elapsed = DateTime.now().difference(happinessStartTime!);
-      if (elapsed.inMinutes >= 1 && !hasWon) {
+      if (elapsed.inMinutes >= 3 && !hasWon) {
         hasWon = true;
         _showWin();
       }
@@ -253,10 +254,30 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
                 )
               ),
 
+              // Display Energy Bar
+              SizedBox(height: 16.0),
+              Text(
+                'Energy Level: $energyLevel',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+              SizedBox(
+                width: 250, 
+                child: LinearProgressIndicator(
+                  value: energyLevel / 100,
+                  color: Colors.blue,
+                  backgroundColor: Colors.blue.shade100,
+                  minHeight: 12,
+                ),
+              ),
+
               // Display happiness and hunger levels
               SizedBox(height: 16.0),
               Text('Happiness Level: $happinessLevel', style: TextStyle(fontSize: 20.0)),
-              SizedBox(height: 16.0),
+              SizedBox(height: 4.0),
               Text('Hunger Level: $hungerLevel', style: TextStyle(fontSize: 20.0)),
               SizedBox(height: 32.0),
 
