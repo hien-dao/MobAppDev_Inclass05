@@ -94,7 +94,15 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
 
   void _playWithPet() {
     setState(() {
-      happinessLevel += 10;
+      if (energyLevel <= 0) {
+        happinessLevel -= 5; // Too tired to play reduces happiness
+      } else {
+        happinessLevel += 10;
+        energyLevel -= 15; // Playing reduces energy
+        if (energyLevel < 0) {
+          energyLevel = 0;
+        }
+      }
       _updateHunger();
     });
   }
@@ -135,14 +143,15 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('YOU WON!'),
-        content: Text('Congratulation! $petName is very happy!!!'),
+        title: Text('YOU WON!!!!'),
+        content: Text('$petName is very happy. You took great care of it!'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
+              _resetGame();
             },
-            child: Text('OK'),
+            child: Text('Restart'),
           ),
         ],
       ),
@@ -153,14 +162,15 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('YOU LOST!'),
+        title: Text('GAME OVER'),
         content: Text('$petName is very upset and it might eat you!'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
+              _resetGame();
             },
-            child: Text('OK'),
+            child: Text('Restart'),
           ),
         ],
       ),
@@ -174,8 +184,9 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
         title: Text('How to Play'),
         content: Text(
           '• Hunger increases every 30 seconds.\n'
-          '• Play with your pet to increase happiness.\n'
-          '• Feed your pet to reduce hunger.\n\n'
+          '• Play with your pet to increase happiness, but it will reduce energy and increase hunger.\n'
+          '• Feed your pet to reduce hunger. Make sure not to overfeed.\n'
+          '• Do not play when energy is 0 or it will reduce happiness.\n\n'
           'Win Condition:\n'
           '• Keep happiness above 80 for 3 minutes.\n\n'
           'Loss Condition:\n'
@@ -197,6 +208,7 @@ class _DigitalPetAppState extends State<DigitalPetApp> {
       hungerLevel = 50;
       hasWon = false;
       happinessStartTime = null;
+      energyLevel = 100;
     });
   }
 
